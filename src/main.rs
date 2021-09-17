@@ -19,13 +19,25 @@ async fn home() -> impl Responder {
         .content_type("text/html; charset=UTF-8")
         .body(fs::read("./index.html").unwrap())
 }
+#[get("/login")]
+async fn login() -> impl Responder {
+    HttpResponse::Ok()
+        .content_type("text/html; charset=UTF-8")
+        .body(fs::read("./login.html").unwrap())
+}
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     let url = env::args().nth(1).unwrap_or("0.0.0.0:8080".to_string());
 
-    HttpServer::new(|| App::new().service(script).service(script2).service(home))
-        .bind(url)?
-        .run()
-        .await
+    HttpServer::new(|| {
+        App::new()
+            .service(script)
+            .service(script2)
+            .service(home)
+            .service(login)
+    })
+    .bind(url)?
+    .run()
+    .await
 }
